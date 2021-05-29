@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<script>
+  
+  function handleSubmit() {
+    hideCopyMessage()
+    disableCopyButton()
+    const indexOfSelectedHeader = getIndexOfSelectedHeader()
+    const indexInDocument = headerIndexes[indexOfSelectedHeader]
+    const nextIndexInDocument = indexOfSelectedHeader < headerIndexes.length 
+      ? headerIndexes[indexOfSelectedHeader + 1] 
+      : indexInDocument
+
+    google.script.run
+      .withSuccessHandler(formatSelectionAndCopy)
+      .getFullTemplate(indexInDocument, nextIndexInDocument, getTemplateVariables())
+  }
+
+  function getIndexOfSelectedHeader() {
+    const allButtons = Array.from(document.querySelectorAll('.template_button'))
+    for (let i = 0; i < allButtons.length; i++) {
+      if (allButtons[i].checked) {
+        return i;
+      }
+    } 
+    // should never get here 
+    window.alert('No Button was checked')
+  }
+
+  function getTemplateVariables() {
+    const company = document.getElementById('company_name').value; 
+    const contact = document.getElementById('contact_name').value;
+
+    return {
+      '<company>': company, 
+      '<contact>': contact
+    }
+  }
+
+  function formatSelectionAndCopy(data){
+    const formattedSelection = getFormattedSelection(data)
+    copySelection(formattedSelection)
+    enableCopyButton()
+    showCopyMessage()
+  }
+
+  function getFormattedSelection(rawTemplateItems) {
+    console.log(rawTemplateItems)
+    const container = document.createElement('div')
+    // Hide element
+    container.style.position = 'fixed'
+    container.style.pointerEvents = 'none'
+    container.style.opacity = 0
+
+    for (let i = 0; i < rawTemplateItems.length; i++) {
+      container.appendChild(createFormattedItem(rawTemplateItems[i]))
+    }
+
+      console.log('created --> ', container)
+
+    return container
+  }
+
+  function createFormattedItem(rawData) {
+    console.log({ rawData })
+    const itemType = rawData.type
+    switch (itemType) {
+      case 'break':
+        return createBreakElement(rawData)
+        break
+      case 'text': 
+        return createTextElement(rawData)
+        break
+      case 'list':
+        return createListElement(rawData)
+        break 
+      case 'link': 
+        return createLinkElement(rawData)
+    }
+  }
+
+  function createBreakElement(rawData) {
+    return document.createElement('br')
+  }
+
+  function createTextElement(rawData) {
+    const span = document.createElement('span')
+    span.textContent = rawData.text
+
+    return span
+  }
+
+  function createListElement(rawData) {
+    const container = document.createElement('ul')
+    // children are each an array, to account for in line links
+    for (const childArr of rawData.children) {
+      const listItem = document.createElement('li')
+      for (const childItem of childArr) {
+        listItem.appendChild(createFormattedItem(childItem))
+      }
+      container.appendChild(listItem)
+    }
+    return container
+  }
+
+  function createLinkElement(rawData){
+    const {text, href} = rawData
+    const link = document.createElement('a'); 
+    const linkText = document.createTextNode(text)
+    link.appendChild(linkText)
+    link.title = text
+    link.href = href
+
+    return link
+  }
+
+  function copySelection(selectionContainer) {
+    // Mount the iframe to the DOM to make `contentWindow` available
+    document.body.appendChild(selectionContainer)
+
+    window.getSelection().removeAllRanges()
+
+    const range = document.createRange()
+    range.selectNode(selectionContainer)
+    window.getSelection().addRange(range)
+
+    document.execCommand('copy')
+  }
+
+  function showCopyMessage() {
+    document.getElementById('copy_confirm').classList.add('visible')
+  }
+
+  function hideCopyMessage() {
+    document.getElementById('copy_confirm').classList.remove('visible')
+  }
+</script>
