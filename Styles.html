@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<style>
+  * {
+    margin: 0;
+    padding: 0; 
+    line-height: 16px; 
+    font-size: 1rem; 
+  }
+
+  form {
+    display: flex; 
+    flex-direction: column; 
+    padding: 1rem .5rem;
+  }
+
+  #name_and_company { 
+    display: flex; 
+    flex-direction: column; 
+    margin-bottom: 1rem;
+  }
+
+  #name_and_company input {
+    margin-bottom: .5rem;
+  }
+
+  #name_and_company label {
+    margin-bottom: .25rem;
+  }
+
+  .template_option {
+    padding: .5rem; 
+    border: 1px solid grey; 
+    cursor: pointer; 
+  }
+
+  .template_option:hover {
+    background-color: gainsboro;
+  }
+
+  .template_option:last-of-type {
+    margin-bottom: 2rem;
+  }
+
+  .template_option input[type='radio'] {
+    margin-right: 1rem;
+  }
+
+  input[type='submit'] {
+    padding: 1rem;
+    border-radius: 5px; 
+    border: none; 
+    background-color: dodgerblue;
+    color: white; 
+    opacity: 1; 
+  }
+
+  input[type='submit'].disabled { 
+    opacity: .6; 
+    color: light-grey; 
+  }
+
+  #copy_confirm {
+    margin-bottom: .5rem; 
+    visibility: hidden; 
+  }
+
+  #copy_confirm.visible{
+    visibility: visible; 
+    color: lawngreen; 
+  }
+</style>

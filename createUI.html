@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<script>
+  google.script.run.withSuccessHandler(loadForm).getTemplateHeaders()
+  let headers = []
+  let headerIndexes = []
+
+  function enableCopyButton() {
+    const btn = document.getElementById('copy')
+    btn.disabled = false
+    btn.classList.remove('disabled')
+  }
+
+  function disableCopyButton() {
+    const btn = document.getElementById('copy')
+    btn.disabled = true
+    btn.classList.add('disabled')
+  }
+
+  function loadForm(headerData) {
+    removeLoadingIndicator()
+
+    headerData.forEach(data => {
+      headers.push(data['text'])
+      headerIndexes.push(data['index'])
+    })
+    console.log('loading form')
+    renderForm()
+  }
+
+  function renderForm() {
+    // const form = document.querySelector('form');
+    const form = document.createElement('form')
+    form.appendChild(nameAndCompany())
+
+    form.addEventListener('submit', handleSubmit)
+    
+    for (var i = 0; i < headers.length; i++) {
+      const templateData = headers[i]
+      form.appendChild(createTemplateOption(templateData))
+    }
+    // this is invisible at first, but we add it so position doesn't change when it appears
+    form.appendChild(copyConfirmMessage())
+    form.appendChild(submitButton())
+
+    document.querySelector('body').appendChild(form)
+  }
+
+  function createTemplateOption(templateData) {
+    const optionContainer = templateLabel(templateData)
+    const labelText = document.createTextNode(templateData)
+
+    optionContainer.classList.add('template_option')
+    optionContainer.appendChild(templateBtn(templateData))
+    optionContainer.appendChild(labelText)
+    optionContainer.addEventListener('click', enableCopyButton)
+
+    return optionContainer
+  }
+
+  function templateBtn(templateData) {
+    const templateButton = document.createElement('input')
+    templateButton.type = 'radio'
+    templateButton.name = 'template'
+    templateButton.classList.add('template_button')
+    templateButton.value = templateData
+    templateButton.id = templateData
+    
+    return templateButton
+  }
+
+  function templateLabel(templateData) {
+    const templateLabel = document.createElement('label')
+    templateLabel.for = templateData
+    return templateLabel
+  }
+
+  function submitButton() {
+    const btn = document.createElement('input')
+    btn.value = 'Copy to Clipboard'
+    btn.type = 'submit'
+    btn.id = 'copy'
+    btn.disabled = true
+    btn.classList.add('disabled')
+
+    return btn
+  }
+
+  function removeLoadingIndicator() {
+    const loading = document.getElementById("loading"); 
+    loading.remove()
+  }
+
+  function lineBreak() {
+    return document.createElement('br')
+  }
+
+  function nameAndCompany() {
+    const container = document.createElement('div')
+    container.innerHTML = `
+      <label for='company_name'>Company name</label>
+      <input type='text' id='company_name' name="company_name" placeholder="Enter company here">
+      <label for='contact_name'>Contact name</label>
+      <input type='text' id='contact_name' name="contact_name" placeholder="Enter contact here">
+    `
+    container.id = 'name_and_company'
+    return container
+  }
+
+  function copyConfirmMessage() {
+    const span = document.createElement('span')
+    span.innerText = 'Copied to clipboard!'
+    span.id = 'copy_confirm'
+    return span
+  }
+</script>
