@@ -43,8 +43,8 @@
     showCopyMessage()
   }
 
+<!-- creates invisible container of generated html, from which we copy into clipboard -->
   function getFormattedSelection(rawTemplateItems) {
-    console.log(rawTemplateItems)
     const container = document.createElement('div')
     // Hide element
     container.style.position = 'fixed'
@@ -55,13 +55,11 @@
       container.appendChild(createFormattedItem(rawTemplateItems[i]))
     }
 
-      console.log('created --> ', container)
-
     return container
   }
 
+<!-- creates html from metadata generated in getTemplates -->
   function createFormattedItem(rawData) {
-    console.log({ rawData })
     const itemType = rawData.type
     switch (itemType) {
       case 'break':

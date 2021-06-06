@@ -1,19 +1,4 @@
-/**
- * To do: 
- * [x] : account for lines that are only spaces, but not technically '' 
- * [x] : how will you know when two inline list elements are the same line? 
- * [x] : button should not be pressable until option is selected 
- * [x] : "copied!" indicator 
- * [x] : variables 
- * [x] : do variables pop up after selection is made? should they pop up after loading indicator 
- * [ ] : pressing copy should recompute changes to header positions
- * [ ] : reset button 
- * [x] : split javascript up into pre-copy, post copy 
- * [x] : styling 
- */
-
 let inputVariables = {}
-
 
 const getTemplateHeaders = () => {
   const headers = []
@@ -84,8 +69,9 @@ const constructListFromIndex = listIndex => {
 }
 
 
+// translates line data from google docs into format the html generator can process
 const constructItemsFromLine = line => {
-  const lineText = withTemplateVars(line.getText())
+  const lineText = line.getText()
   const metadataForLine = []
   let currentText = '';
   let currentLink = '';
@@ -118,6 +104,8 @@ const constructItemsFromLine = line => {
 
     currentText += lineText[i]
   }
+  // replace form variables with corresponding values 
+  currentText = withTemplateVars(currentText)
   // cleanup whatever is left over
   if (currentLink) {
     metadataForLine.push(linkMetaData(currentText, currentLink))
@@ -129,7 +117,7 @@ const constructItemsFromLine = line => {
 }
 
 const withTemplateVars = text => {
-  return text.replace(/<contact>|<company>/gi, inputVariables[matched])
+  return text.replace(/<contact>|<company>/gi, matched => inputVariables[matched])
 }
 
 
